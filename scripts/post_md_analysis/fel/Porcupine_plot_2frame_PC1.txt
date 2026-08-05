@@ -1,0 +1,39 @@
+#### If plotting Porcupine for 20 frames as shade ####
+
+1. gmx anaeig -s md_250ns.tpr -f md_250ns_nopbc.xtc -n index.ndx -eig eigenval.xvg -v eigenvec.trr -extr pc1_extreme_20.pdb -nframes 20 -first 1 -last 1
+2. in pymol: run pc1_viridis_motion.py
+
+#### If plotting for Porcupine of 2 frames ####
+1. gmx anaeig \
+    -v eigenvec.trr \
+    -eig eigenval.xvg \
+    -s md.tpr \
+    -f md_fitted.xtc \
+    -n index.ndx \
+    -first 2 \
+    -last 2 \
+    -extr PC2_extremes.pdb \
+    -nframes 2
+    
+2. split into two state manually, save them as PC1_state1.pdb and PC1_state2.pdb
+
+3. in pymol: 
+
+reinitialize
+
+load PC1_state1.pdb, pc1_neg
+load PC1_state2.pdb, pc1_pos
+
+hide everything, all
+
+set cartoon_trace, 1
+show cartoon, pc1_neg
+cartoon tube, pc1_neg
+set cartoon_tube_radius, 0.35
+rebuild
+
+disable pc1_pos
+
+4. in pymol: run pc1_coloured_motion.py
+5. pc1_colored_motion pc1_neg, pc1_pos, pc1_neg, pc1_vectors, 1, 0.5, 3.0, 0.0, 15.0, 0.20, 0.3, 1, torcetrapib_PC1_displacement.csv
+6. For saving the colourbar plot: render_pc1_with_colorbar pc1_motion_raw.png, torcetrapib_PC1_motion_RdYlBu.png, 0.0, 15.0, 2400, 1200, 600
