@@ -2,9 +2,9 @@
 
 A multi-stage, structure-based drug-repurposing pipeline that combines molecular docking, ligand strain filtering, consensus clustering, molecular dynamics (MD), MM-PBSA free-energy analysis, and biochemical validation to identify repurposed small-molecule inhibitors of Cholesteryl Ester Transfer Protein (CETP).
 
-Paper: [DOI link — add once published]
-Preprint: [bioRxiv/ChemRxiv link — add if posted]
-Data (Zenodo): [DOI badge — add once archived]
+Paper: [DOI link — To Be Added]
+Preprint: [bioRxiv/ChemRxiv link — To Be Added]
+Data (Zenodo): [DOI badge — To Be Added]
 
 ![Graphical abstract](assets/graphical_abstract.svg)
 
@@ -19,7 +19,49 @@ Data (Zenodo): [DOI badge — add once archived]
 
 ## Abstract
 
-CETP is a clinically validated but difficult target for cardiovascular drug discovery. This repository contains the full computational pipeline used to identify repurposed small-molecule CETP inhibitors from a curated library of ~6,500 FDA-approved, investigational, and clinical-trial compounds. The workflow proceeds through rigid and flexible docking against the CETP tunnel, ligand-strain filtering, consensus similarity-based clustering to enforce chemotype diversity, ADME/PAINS filtering, all-atom MD simulation of shortlisted complexes, MM-PBSA binding free-energy decomposition, and free-energy-landscape analysis. Two candidates, Adapalene and Buclizine, were experimentally confirmed to inhibit CETP activity in a concentration-dependent manner in a fluorescence-based biochemical assay.
+Cholesteryl ester transfer protein is involved in the transfer of neutral lipids among plasma lipoproteins and represents an established target for modulating lipoprotein metabolism. This study applies a systematic drug-repurposing strategy to identify chemically distinct compounds capable of inhibiting CETP. 
+The workflow integrates compound preprocessing, virtual screening, structure-based molecular docking, chemical-similarity and clustering analyses, molecular-dynamics simulations, MM/PBSA calculations, principal-component analysis, free-energy-landscape analysis, and biochemical CETP inhibition assays.
+
+---
+
+## Study Workflow
+
+The study comprises the following stages:
+
+1. **Compound preprocessing**  
+   Preparation, standardization, geometry optimization, and filtering of the
+   drug library.
+
+2. **Virtual screening**  
+   Structure-based screening of the curated library against the CETP
+   inhibitor-binding tunnel.
+
+3. **Docking and interaction analysis**  
+   Evaluation of docking scores, binding orientations, residue contacts, and
+   chemical diversity.
+
+4. **Candidate prioritization**  
+   Integration of docking, clustering, similarity, strain-energy, and ADME
+   criteria to select structurally diverse candidates.
+
+5. **Molecular-dynamics simulations**  
+   Explicit-solvent simulations of CETP–ligand complexes and analysis of
+   structural stability and ligand retention.
+
+6. **Post-MD energetic and conformational analyses**  
+   MM/PBSA calculations, residue-wise energy decomposition,
+   principal-component analysis, free-energy landscapes, and collective-motion
+   characterization.
+
+7. **Biochemical validation**  
+   Measurement of CETP inhibition for the prioritized repurposing candidates
+   using a fluorescence-based activity assay.
+
+8. **Comparative pharmacophore interpretation**  
+   Evaluation of common hydrophobic, adaptable, and polar features associated
+   with CETP recognition.
+
+---
 
 ## Repository Structure
 
@@ -31,121 +73,179 @@ CETP-VS/
 ├── LICENSE
 ├── environment.yml
 ├── CITATION.cff
-├── requirements.txt
 ├── CONTRIBUTING.md
+├── requirements.txt
+├── .gitignore
+│
 ├── assets/
-│   └── graphical_abstract.svg
-├── data/
-│   └── README.md                  # pointers to the Zenodo record; no large files here
+│   └── graphical_abstract.png
+│
 ├── scripts/
-│   ├── 01_library_curation/
-│   │   ├── merge_fda_drugbank_chembl.py
-│   │   └── standardize_dedupe.py
-│   ├── 02_conformer_generation/
-│   │   └── generate_conformers.py       # Open Babel weighted rotor search
-│   ├── 03_docking/
-│   │   ├── screen1_rigid_docking.py
-│   │   └── screen2_flexible_docking.py
-│   ├── 04_strain_filter/
-│   │   └── torsional_strain_filter.py
-│   ├── 05_clustering/
-│   │   └── consensus_clustering.py      # 2D fingerprint + 3D shape/electrostatic
-│   ├── 06_admet_pains_filter/
-│   │   └── admet_pains_filter.py
-│   ├── 07_md_simulation/
-│   │   ├── prep_topology.py             # ATB-generated GROMOS topologies
-│   │   └── run_md.sh                    # GROMACS 2021.1 production run
-│   ├── 08_mmpbsa/
-│   │   └── run_mmpbsa.py                # g_mmpbsa wrapper + FEL projection
-│   └── 09_assay_analysis/
-│       └── plot_inhibition_curves.py
-└── notebooks/
-    └── figures.ipynb                    # regenerates manuscript figures
+│   ├── assay/
+│   ├── clustering/
+│   ├── docking/
+│   ├── post_md_analysis/
+│   └── preprocessing/
+│
+├── data/
+│   └── README.md
+│
+└── plot_results/
+    └── README.md
 ```
 
-## Environment Setup
+### Script directories
 
-```bash
-conda env create --name cetp-vs --file=environment.yml
-conda activate cetp-vs
-```
+| Directory | Description |
+|---|---|
+| `scripts/preprocessing/` | Compound preparation, standardization, filtering, and format conversion |
+| `scripts/docking/` | Docking-score processing and protein–ligand interaction analysis |
+| `scripts/clustering/` | Chemical-similarity calculations, diversity analysis, and compound clustering |
+| `scripts/post_md_analysis/` | MD trajectory processing, MM/PBSA, PCA, FEL, and structural analyses |
+| `scripts/assay/` | Biochemical assay normalization, inhibition calculations, and plotting |
 
-`environment.yml` should pin: RDKit, Open Babel, AutoDock Vina, scikit-learn, GROMACS (or a note pointing to a separate cluster install, since GROMACS is usually built from source on HPC), MDAnalysis, g_mmpbsa, pandas, matplotlib.
+The complete inputs and outputs required by these scripts are archived in the
+associated Zenodo dataset.
 
-## Usage
-
-```bash
-# 0. Curate and standardize the FDA + DrugBank + ChEMBL library
-python scripts/01_library_curation/merge_fda_drugbank_chembl.py
-python scripts/01_library_curation/standardize_dedupe.py
-
-# 1. Generate low-energy 3D conformers
-python scripts/02_conformer_generation/generate_conformers.py
-
-# 2. Screen-1: rigid docking against the Torcetrapib-defined CETP pocket
-python scripts/03_docking/screen1_rigid_docking.py
-
-# 3. Screen-2: flexible docking with local side-chain sampling
-python scripts/03_docking/screen2_flexible_docking.py
-
-# 4. Torsional strain filtering (5 TEU cutoff)
-python scripts/04_strain_filter/torsional_strain_filter.py
-
-# 5. Consensus clustering into chemotype families
-python scripts/05_clustering/consensus_clustering.py
-
-# 6. ADME/PAINS translational filtering
-python scripts/06_admet_pains_filter/admet_pains_filter.py
-
-# 7. MD simulation of shortlisted complexes (250 ns, GROMACS)
-bash scripts/07_md_simulation/run_md.sh
-
-# 8. MM-PBSA binding free energy + free-energy-landscape analysis
-python scripts/08_mmpbsa/run_mmpbsa.py
-
-# 9. Biochemical assay analysis and plotting
-python scripts/09_assay_analysis/plot_inhibition_curves.py
-```
-
-## Data availability
-
-The complete computational and experimental dataset is available from Zenodo:
-
-**Dataset DOI:** [insert Zenodo DOI]
-
-- **docking/** — rigid and flexible docking poses and scores for all screened conformers
-- **clustering/** — similarity matrices, cluster assignments, and consensus scores
-- **md_trajectories/** — GROMACS input/output for the five lead complexes plus the Torcetrapib control (250 ns each)
-- **mmpbsa/** — per-complex and per-residue binding free-energy tables
-- **assay_data/** — raw fluorescence reads and normalized inhibition data for Adapalene, Buclizine, and Mefloquine
-- **figures/** — source data and scripts used to generate all manuscript figures
+---
 
 ## Installation
+
+### Clone the repository
 
 ```bash
 git clone https://github.com/Sudipta-Nandi-IITM/CETP_Drug_Repurposing.git
 cd CETP_Drug_Repurposing
+```
+
+### Create the Conda environment
+
+```bash
 conda env create -f environment.yml
 conda activate cetp-repurposing
-
-## Citing
-
-If this pipeline is useful for your work, please cite:
-
-```bibtex
-@article{nandi2026cetp,
-  author  = {Nandi, Sudipta and Senapati, Sanjib},
-  title   = {Structure-guided Exploration of Repurposed Small Molecule Inhibitors Targeting Cholesteryl Ester Transfer Protein},
-  journal = {[Journal name — add on acceptance]},
-  year    = {2026},
-  doi     = {[DOI — add on publication]}
-}
 ```
+
+Alternatively, install the Python dependencies using:
+
+```bash
+pip install -r requirements.txt
+```
+
+Scientific programs such as GROMACS, gmx_MMPBSA, the molecular-docking
+software, and molecular-visualization tools must be installed separately.
+Their versions and relevant settings are documented in the manuscript and
+Zenodo dataset.
+
+---
+
+## Usage
+
+The scripts require the input files deposited in the associated Zenodo
+dataset.
+
+### General workflow
+
+1. Download and extract the Zenodo dataset.
+2. Create a separate local output directory.
+3. Run the required script using the corresponding Zenodo file as input.
+4. Store newly generated files outside the original Zenodo dataset directory.
+
+## Data Availability
+
+The complete computational and experimental data supporting this study will be
+deposited in Zenodo.
+
+**Zenodo dataset DOI:** `[to be added]`
+
+The Zenodo archive will include:
+
+- compound identifiers and virtual-screening results;
+- molecular-docking inputs, parameters, poses, scores, and interaction outputs;
+- molecular-dynamics inputs, topologies, trajectories, structures, and logs;
+- structural-stability and protein–ligand interaction analyses;
+- MM/PBSA inputs, per-frame energies, energetic components, and residue
+  decomposition;
+- PCA projections, eigenvalues, marginal free-energy profiles, two-dimensional
+  free-energy landscapes, and representative basin structures;
+- ADME, chemical-similarity, clustering, and strain-energy results;
+- raw and processed biochemical CETP assay measurements;
+- numerical source data underlying the main and Supporting Information figures.
+
+The GitHub repository contains the analysis scripts and documentation. Large
+data files and scientific outputs are intentionally not duplicated here.
+
+Licensed third-party database records are not redistributed. Database
+identifiers, provenance, retrieval information, and processing procedures are
+provided where permitted.
+
+---
+
+## Reproducibility
+
+The recommended reproduction order is:
+
+```text
+Preprocessing
+      ↓
+Virtual screening and docking
+      ↓
+Similarity and clustering analysis
+      ↓
+Molecular-dynamics analysis
+      ↓
+MM/PBSA and residue decomposition
+      ↓
+PCA and free-energy landscapes
+      ↓
+Biochemical assay processing
+      ↓
+Manuscript figure generation
+```
+
+Each script should be executed using the associated files in the Zenodo
+dataset. Users are encouraged to retain the original archived data unchanged
+and write reproduced outputs to a separate directory.
+
+---
+
+## Citation
+
+Citation information will be updated following publication.
+
+Machine-readable citation metadata are provided in
+[`CITATION.cff`](CITATION.cff).
+
+---
+
+## Contributing
+
+Contributions, bug reports, and suggestions are welcome. Please consult
+[`CONTRIBUTING.md`](CONTRIBUTING.md) before submitting an issue or pull
+request.
+
+For scientific questions concerning the associated study, contact the
+corresponding authors directly.
+
+---
 
 ## License
 
-This project is licensed under the MIT License — see [LICENSE](LICENSE) for details.
+The source code and analysis scripts in this repository are licensed under the
+**BSD 3-Clause License**.
+
+See [`LICENSE`](LICENSE) for the complete license text.
+
+Original research data generated for the study will be distributed through
+Zenodo under the license specified in the corresponding dataset record.
+Third-party materials remain subject to their original licenses and terms of
+use.
+
+---
 
 ## Contact
 
-Sudipta Nandi — Computational Biophysics Lab, Dept. of Biotechnology, IIT Madras ([nandi.sudipta5997@gmail.com](mailto:nandi.sudipta5997@gmail.com))
+**Sudipta Nandi**  
+[Department of Biotechnology]  
+[Indian Institute of Technology Madras]  
+Email: [nandi.sudipta5997@gmail.com]  
+ORCID: [0009-0007-7818-200X]
