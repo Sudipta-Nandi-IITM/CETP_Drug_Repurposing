@@ -1,0 +1,19 @@
+# Core scientific stack
+numpy
+pandas
+scikit-learn
+matplotlib
+seaborn
+
+# Cheminformatics
+rdkit
+MDAnalysis
+biopython
+
+# Docking / conformer generation (Python bindings; CLI tools like Open Babel,
+# AutoDock Vina, and GROMACS itself are best installed via conda or your
+# cluster's module system rather than pip — see environment.yml)
+vina
+
+# Notebooks (optional, for notebooks/figures.ipynb)
+jupyterlab

@@ -1,0 +1,21 @@
+name: CETP_drug_repurposing
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.10
+  - rdkit
+  - openbabel
+  - scikit-learn
+  - pandas
+  - numpy
+  - matplotlib
+  - seaborn
+  - mdanalysis
+  - biopython
+  - pip
+  - pip:
+      - vina           # AutoDock Vina python bindings, if used instead of CLI binary
+      # GROMACS and g_mmpbsa are typically compiled/installed separately on an HPC
+      # cluster rather than via conda — document your cluster module/version here,
+      # e.g. "module load gromacs/2021.1"

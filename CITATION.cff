@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this pipeline, please cite the associated article."
+title: "CETP-VS: Structure-Guided Virtual Screening for CETP Inhibitor Repurposing"
+authors:
+  - family-names: Nandi
+    given-names: Sudipta
+  - family-names: Senapati
+    given-names: Sanjib
+preferred-citation:
+  type: article
+  title: "Structure-guided Exploration of Repurposed Small Molecule Inhibitors Targeting Cholesteryl Ester Transfer Protein"
+  authors:
+    - family-names: Nandi
+      given-names: Sudipta
+    - family-names: Senapati
+      given-names: Sanjib
+  year: 2026
+  # journal: "Add on acceptance"
+  # doi: "Add on publication"
