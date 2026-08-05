@@ -1,0 +1,13 @@
+VS_Ligand_Preparation
+
+1. obabel 1Dstructures.smi -O 2Dstructures.sdf --gen2D [To generate 1D to 2D conformers]
+2. obabel 2Dstructures.sdf -O 3Dstructures.sdf --gen3D [To generate 2D to 3D conformers]
+3. obabel zinc.sdf drugbank.sdf chemspider.sdf 3Dstructures.sdf -O 3Dstructures.sdf [To combine all files as one output]
+4. obabel 3D structures.sdf -O H3dstructures.sdf -h [To add hydrogens]
+5. obabel 3D structures.sdf -O H3dstructures.sdf -d [To delete hydrogens]
+5. obabel H3Dstructures.sdf -O cH3Dstructures.sdf --partialcharge gasteiger [To add partial charges]
+6. obabel ucH3D structures.sdf -O MucH3D structures.sdf --filter "MW<500" [Molecular weight filter]
+7. obabel MucH3Dstructures.sdf -O rMucH3Dstructures.sdf --filter "!ROTATABLE_BOND || ROTATABLE_BOND > 5" [Rotatable bond filter]
+8. obabel rMucH3Dstructures.sdf -O cH3Dstructures.sdf --filter "logP>5" [Partition coefficient filter]
+9. obabel cH3Dstructures.sdf -O confcH3Dstructures.sdf --conformer --nconf 50 --score rmsd --writeconformers [Conformers generation]
+10. obabel -ismi input.smi -oinchi -O output.inchi -e --unique [To remove any erroneous file/incomplete structure files and to remove duplicate structures]
